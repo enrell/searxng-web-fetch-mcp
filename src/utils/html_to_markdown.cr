@@ -15,7 +15,7 @@ module Utils
       markdown = process_blockquotes(markdown)
       markdown = process_paragraphs(markdown)
       markdown = process_line_breaks(markdown)
-      markdown = clean_whitespace(markdown)
+      clean_whitespace(markdown)
     end
 
     private def process_pre_code(html : String) : String
@@ -38,7 +38,7 @@ module Utils
       (6).downto(1) do |level|
         prefix = "#" * level
         regex = /<h#{level}[^>]*>([\s\S]*?)<\/h#{level}>/i
-        markdown = markdown.gsub(regex) do |match|
+        markdown = markdown.gsub(regex) do |_|
           content = strip_tags($1)
           "\n#{prefix} #{content}\n\n"
         end
@@ -49,7 +49,7 @@ module Utils
     private def process_lists(html : String) : String
       markdown = html.gsub(/<ul[^>]*>/i, "\n").gsub(/<\/ul>/i, "\n")
       markdown = markdown.gsub(/<ol[^>]*>/i, "\n").gsub(/<\/ol>/i, "\n")
-      markdown = markdown.gsub(/<li[^>]*>([\s\S]*?)<\/li>/i) do |match|
+      markdown = markdown.gsub(/<li[^>]*>([\s\S]*?)<\/li>/i) do |_|
         content = strip_tags($1).strip
         "- #{content}\n"
       end
@@ -57,7 +57,7 @@ module Utils
     end
 
     private def process_links(html : String) : String
-      html.gsub(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/i) do |match|
+      html.gsub(/<a[^>]*href=["']([^"']*)["'][^>]*>([\s\S]*?)<\/a>/i) do |_|
         url = $1
         text = strip_tags($2)
         "[#{text}](#{url})"
@@ -77,26 +77,26 @@ module Utils
 
     private def process_bold_italic(html : String) : String
       markdown = html
-      markdown = markdown.gsub(/<strong[^>]*>([\s\S]*?)<\/strong>/i) do |match|
+      markdown = markdown.gsub(/<strong[^>]*>([\s\S]*?)<\/strong>/i) do |_|
         "**#{strip_tags($1)}**"
       end
-      markdown = markdown.gsub(/<b[^>]*>([\s\S]*?)<\/b>/i) do |match|
+      markdown = markdown.gsub(/<b[^>]*>([\s\S]*?)<\/b>/i) do |_|
         "**#{strip_tags($1)}**"
       end
-      markdown = markdown.gsub(/<em[^>]*>([\s\S]*?)<\/em>/i) do |match|
+      markdown = markdown.gsub(/<em[^>]*>([\s\S]*?)<\/em>/i) do |_|
         "*#{strip_tags($1)}*"
       end
-      markdown = markdown.gsub(/<i[^>]*>([\s\S]*?)<\/i>/i) do |match|
+      markdown = markdown.gsub(/<i[^>]*>([\s\S]*?)<\/i>/i) do |_|
         "*#{strip_tags($1)}*"
       end
-      markdown = markdown.gsub(/<code[^>]*>([\s\S]*?)<\/code>/i) do |match|
+      markdown = markdown.gsub(/<code[^>]*>([\s\S]*?)<\/code>/i) do |_|
         "`#{strip_tags($1)}`"
       end
       markdown
     end
 
     private def process_blockquotes(html : String) : String
-      html.gsub(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/i) do |match|
+      html.gsub(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/i) do |_|
         content = strip_tags($1)
         lines = content.split("\n")
         lines.map { |line| "> #{line}" }.join("\n")
@@ -104,7 +104,7 @@ module Utils
     end
 
     private def process_paragraphs(html : String) : String
-      html.gsub(/<p[^>]*>([\s\S]*?)<\/p>/i) do |match|
+      html.gsub(/<p[^>]*>([\s\S]*?)<\/p>/i) do |_|
         content = strip_tags($1).strip
         "#{content}\n\n" unless content.empty?
       end

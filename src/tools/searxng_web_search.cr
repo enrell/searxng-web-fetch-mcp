@@ -36,44 +36,42 @@ class SearxngWebSearch < MCP::AbstractTool
   end
 
   private def search_results(query : String, num_results : Int, language : String)
-    begin
-      uri = URI.parse("#{SEARXNG_URL}/search")
-      client = create_proxy_client
+    uri = URI.parse("#{SEARXNG_URL}/search")
+    client = create_proxy_client
 
-      query_params = HTTP::Params.build do |params|
-        params.add("q", query)
-        params.add("format", "json")
-        params.add("lang", language)
-        params.add("engines", "general")
-        params.add("categories", "general")
-        params.add("safesearch", "0")
-        params.add("num_results", num_results.to_s)
-      end
+    query_params = HTTP::Params.build do |params|
+      params.add("q", query)
+      params.add("format", "json")
+      params.add("lang", language)
+      params.add("engines", "general")
+      params.add("categories", "general")
+      params.add("safesearch", "0")
+      params.add("num_results", num_results.to_s)
+    end
 
-      request = HTTP::Request.new("GET", "#{uri.path}?#{query_params}")
-      response = client.exec(request)
+    request = HTTP::Request.new("GET", "#{uri.path}?#{query_params}")
+    response = client.exec(request)
 
-      if response.status_code != 200
-        return {
-          "success" => false,
-          "error"   => "SearXNG returned status #{response.status_code}",
-          "results" => [] of String,
-        }
-      end
-
-      results = parse_search_results(response.body)
-      {
-        "success" => true,
-        "query"   => query,
-        "results" => results,
-      }
-    rescue ex : Exception
-      {
+    if response.status_code != 200
+      return {
         "success" => false,
-        "error"   => ex.message || "Unknown error",
+        "error"   => "SearXNG returned status #{response.status_code}",
         "results" => [] of String,
       }
     end
+
+    results = parse_search_results(response.body)
+    {
+      "success" => true,
+      "query"   => query,
+      "results" => results,
+    }
+  rescue ex : Exception
+    {
+      "success" => false,
+      "error"   => ex.message || "Unknown error",
+      "results" => [] of String,
+    }
   end
 
   private def create_proxy_client

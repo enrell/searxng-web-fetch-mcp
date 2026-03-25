@@ -132,50 +132,51 @@ module Extraction
     end
 
     private def find_main_content(doc : Lexbor::Parser) : String
+      candidates = collect_candidates(doc)
+
+      return doc.body.try(&.inner_text) || "" if candidates.empty?
+
+      best = candidates.max_by { |cand| cand[:score] }
+      best[:node].inner_text rescue ""
+    end
+
+    private def collect_candidates(doc : Lexbor::Parser)
       candidates = [] of {node: Lexbor::Node, score: Float64}
 
-      article = doc.nodes("article").first?
-      if article
-        content = article.inner_text
-        score = calculate_score(article)
-        candidates << {node: article, score: score}
-      end
-
-      main = doc.nodes("main").first?
-      if main
-        candidates << {node: main, score: calculate_score(main)}
-      end
-
-      role_main = doc.nodes("[role=main]").first?
-      if role_main
-        candidates << {node: role_main, score: calculate_score(role_main)}
-      end
+      add_candidate_if_present(doc.nodes("article").first?, candidates)
+      add_candidate_if_present(doc.nodes("main").first?, candidates)
+      add_candidate_if_present(doc.nodes("[role=main]").first?, candidates)
 
       doc.nodes("div").each do |div|
-        div_id = div["id"]?
-        div_class = div["class"]?
-        next if div_id.nil? && div_class.nil?
-
-        class_id = "#{div_id} #{div_class}".downcase
-
-        boost = BOOST_CLASSES.any? { |c| class_id.includes?(c) }
-        penalty = PENALTY_CLASSES.any? { |c| class_id.includes?(c) }
-
-        next if penalty && !boost
-
-        score = calculate_score(div)
-        score += 2.0 if boost
-        score -= 2.0 if penalty
-
+        score = div_candidate_score(div)
+        next if score.nil?
         candidates << {node: div, score: score}
       end
 
-      if candidates.empty?
-        return doc.body.try(&.inner_text) || ""
-      end
+      candidates
+    end
 
-      best = candidates.max_by { |c| c[:score] }
-      best[:node].inner_text rescue ""
+    private def add_candidate_if_present(node : Lexbor::Node?, candidates : Array({node: Lexbor::Node, score: Float64}))
+      return if node.nil?
+      candidates << {node: node, score: calculate_score(node)}
+    end
+
+    private def div_candidate_score(div : Lexbor::Node) : Float64?
+      div_id = div["id"]?
+      div_class = div["class"]?
+      return nil if div_id.nil? && div_class.nil?
+
+      class_id = "#{div_id} #{div_class}".downcase
+      boost = BOOST_CLASSES.any? { |_cls| class_id.includes?(_cls) }
+      penalty = PENALTY_CLASSES.any? { |_cls| class_id.includes?(_cls) }
+
+      return nil if penalty && !boost
+
+      score = calculate_score(div)
+      score += 2.0 if boost
+      score -= 2.0 if penalty
+
+      score
     end
 
     private def calculate_score(node : Lexbor::Node) : Float64
@@ -200,8 +201,8 @@ module Extraction
 
     private def extract_link_text(node : Lexbor::Node) : Array(String)
       links = [] of String
-      node.nodes("a").each do |a|
-        links << a.inner_text rescue ""
+      node.nodes("a").each do |anchor|
+        links << anchor.inner_text rescue ""
       end
       links
     end

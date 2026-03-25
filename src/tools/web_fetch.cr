@@ -32,42 +32,40 @@ class WebFetch < MCP::AbstractTool
   end
 
   private def fetch_and_extract(url : String, include_metadata : Bool)
-    begin
-      html = fetch_html(url)
-      return {
-        "success" => false,
-        "error"   => "Failed to fetch URL",
-        "url"     => url,
-      } if html.empty?
+    html = fetch_html(url)
+    return {
+      "success" => false,
+      "error"   => "Failed to fetch URL",
+      "url"     => url,
+    } if html.empty?
 
-      extractor = Extraction::TrafilaturaExtractor.new
-      result = extractor.extract(html)
+    extractor = Extraction::TrafilaturaExtractor.new
+    result = extractor.extract(html)
 
-      markdown = Utils::HtmlToMarkdown.convert(result.text)
+    markdown = Utils::HtmlToMarkdown.convert(result.text)
 
-      response = Hash(String, JSON::Any).new
-      response["success"] = JSON::Any.new(true)
-      response["url"] = JSON::Any.new(url)
-      response["content"] = JSON::Any.new(markdown)
+    response = Hash(String, JSON::Any).new
+    response["success"] = JSON::Any.new(true)
+    response["url"] = JSON::Any.new(url)
+    response["content"] = JSON::Any.new(markdown)
 
-      if include_metadata
-        metadata = Hash(String, JSON::Any).new
-        metadata["title"] = JSON::Any.new(result.title)
-        metadata["author"] = JSON::Any.new(result.author)
-        metadata["date"] = JSON::Any.new(result.date)
-        metadata["language"] = JSON::Any.new(result.language)
-        metadata["url"] = JSON::Any.new(result.url)
-        response["metadata"] = JSON::Any.new(metadata)
-      end
-
-      response
-    rescue ex : Exception
-      {
-        "success" => false,
-        "error"   => ex.message || "Unknown error",
-        "url"     => url,
-      }
+    if include_metadata
+      metadata = Hash(String, JSON::Any).new
+      metadata["title"] = JSON::Any.new(result.title)
+      metadata["author"] = JSON::Any.new(result.author)
+      metadata["date"] = JSON::Any.new(result.date)
+      metadata["language"] = JSON::Any.new(result.language)
+      metadata["url"] = JSON::Any.new(result.url)
+      response["metadata"] = JSON::Any.new(metadata)
     end
+
+    response
+  rescue ex : Exception
+    {
+      "success" => false,
+      "error"   => ex.message || "Unknown error",
+      "url"     => url,
+    }
   end
 
   private def fetch_html(url : String) : String
