@@ -49,12 +49,19 @@ async function downloadBinary(version, platform) {
       redirect: 'follow'
     }, (response) => {
       if (response.statusCode === 302 || response.statusCode === 301) {
+        response.resume();
         https.get(response.headers.location, (redirectResponse) => {
-          handleResponse(redirectResponse, resolve, reject);
+          if (redirectResponse.statusCode === 200) {
+            handleResponse(redirectResponse, resolve, reject);
+          } else {
+            redirectResponse.resume();
+            reject(new Error(`HTTP ${redirectResponse.statusCode}: ${response.headers.location}`));
+          }
         }).on('error', reject);
       } else if (response.statusCode === 200) {
         handleResponse(response, resolve, reject);
       } else {
+        response.resume();
         reject(new Error(`HTTP ${response.statusCode}: ${url}`));
       }
     });
