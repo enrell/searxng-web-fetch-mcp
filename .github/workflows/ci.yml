@@ -15,16 +15,21 @@ jobs:
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
         with:
-          crystal_version: 1.20.0
+          crystal: 1.20.0
 
       - name: Install dependencies
         run: shards install
 
+      - name: Run ameba linter
+        run: |
+          if [ -f bin/ameba ]; then
+            ./bin/ameba
+          else
+            shards install && ./bin/ameba
+          fi
+
       - name: Run tests
         run: crystal spec
-
-      - name: Run linter
-        run: ./bin/ameba
 
   build:
     runs-on: ubuntu-latest
@@ -34,7 +39,7 @@ jobs:
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
         with:
-          crystal_version: 1.20.0
+          crystal: 1.20.0
 
       - name: Build
         run: |
