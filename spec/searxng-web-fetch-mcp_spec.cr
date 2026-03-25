@@ -1,9 +1,12 @@
 require "./spec_helper"
 
-describe Searxng::Web::Fetch::Mcp do
-  # TODO: Write tests
+describe SearxngWebFetchMcp do
+  it "has a version" do
+    SearxngWebFetchMcp::VERSION.should eq("0.1.0")
+  end
 
-  it "works" do
-    false.should eq(true)
+  it "should log correctly" do
+    # Should not raise
+    SearxngWebFetchMcp.log("INFO", "test message")
   end
 end
