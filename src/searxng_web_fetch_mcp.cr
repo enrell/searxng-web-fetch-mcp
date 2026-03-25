@@ -5,7 +5,7 @@ require "./extraction/*"
 require "./utils/*"
 
 module SearxngWebFetchMcp
-  VERSION = "0.1.0"
+  VERSION = "0.1.1"
 
   LOG_LEVEL = ENV.fetch("LOG_LEVEL", "INFO").upcase
 
