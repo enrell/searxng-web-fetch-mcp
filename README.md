@@ -11,7 +11,7 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server writte
 
 ## Prerequisites
 
-- [SearXNG](https://docs.searxng.org/) - A self-hosted metasearch engine
+- [SearXNG](https://docs.searxng.org/) - A self-hosted metasearch engine (**Must have JSON format enabled**, e.g., via `SEARXNG_search.formats=html,json`)
 - [Byparr](https://github.com/ThePhaseless/byparr) - Anti-captcha proxy for web scraping
 
 ## Quick Start (npx)
@@ -78,7 +78,7 @@ The compiled binary `searxng-web-fetch-mcp` will be in the current directory.
 
 ## Usage
 
-Ensure SearXNG and Byparr are running:
+Ensure SearXNG and Byparr are running. **Important:** Your SearXNG instance MUST have the JSON output format enabled or searches will return an HTTP 403 error. You can enable this in your docker-compose environment variables: `- SEARXNG_search.formats=html,json`.
 
 - SearXNG: `http://localhost:8888`
 - Byparr: `http://localhost:8191`
@@ -147,7 +147,7 @@ Then reload MCP servers in Claude Code with `/mcp reload`.
 ## Architecture
 
 - **Language**: Crystal
-- **HTTP Client**: Uses `connect-proxy` for proxy support via Byparr
+- **HTTP Client**: Web fetching uses `connect-proxy` for anti-captcha proxy support via Byparr (SearXNG searches connect directly)
 - **HTML Parsing**: Lexbor for fast HTML parsing
 - **Content Extraction**: Trafilatura-style algorithm to identify main content
 - **Protocol**: MCP stdio server

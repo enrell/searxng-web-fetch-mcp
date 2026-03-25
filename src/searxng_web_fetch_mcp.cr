@@ -65,5 +65,7 @@ class MCP::StdioHandler
   end
 end
 
-# Start stdio server
-MCP::StdioHandler.start_server("searxng-web-fetch-mcp")
+# Start stdio server (unless we are running specs)
+unless PROGRAM_NAME.includes?("spec")
+  MCP::StdioHandler.start_server("searxng-web-fetch-mcp")
+end
