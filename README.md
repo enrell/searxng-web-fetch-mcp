@@ -80,7 +80,7 @@ Ensure SearXNG and Byparr are running, then use the MCP as configured above.
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `SEARXNG_URL` | URL of your SearXNG instance | `http://localhost:8080` |
+| `SEARXNG_URL` | URL of your SearXNG instance | `http://localhost:8888` |
 | `BYPARR_URL` | URL of your Byparr proxy | `http://localhost:8191` |
 | `LOG_LEVEL` | Logging verbosity (DEBUG, INFO, WARN, ERROR) | `INFO` |
 
