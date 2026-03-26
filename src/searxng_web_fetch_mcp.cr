@@ -5,7 +5,7 @@ require "./extraction/*"
 require "./utils/*"
 
 module SearxngWebFetchMcp
-  VERSION = "0.1.4"
+  VERSION = "0.1.5"
 
   LOG_LEVEL               = ENV.fetch("LOG_LEVEL", "INFO").upcase
   MCP_TIMEOUT             = ENV.fetch("MCP_TIMEOUT", "30").to_i
