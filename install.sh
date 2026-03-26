@@ -5,8 +5,37 @@ REPO="enrell/searxng-web-fetch-mcp"
 BIN_DIR="${HOME}/.local/bin"
 BIN_NAME="searxng-web-fetch-mcp"
 INSTALL_PATH="${BIN_DIR}/${BIN_NAME}"
+FORCE_UPDATE="${FORCE_UPDATE:-false}"
 
 mkdir -p "${BIN_DIR}"
+
+get_current_version() {
+    if [ -f "${INSTALL_PATH}" ]; then
+        "${INSTALL_PATH}" 2>&1 | grep -oP 'v\d+\.\d+\.\d+' | head -1 || echo "unknown"
+    else
+        echo "none"
+    fi
+}
+
+get_latest_version() {
+    curl -sL "https://api.github.com/repos/${REPO}/releases/latest" | grep -oP '"tag_name":\s*"\K[^"]+' || echo ""
+}
+
+if [ -f "${INSTALL_PATH}" ] && [ "${FORCE_UPDATE}" != "true" ]; then
+    current=$(get_current_version)
+    latest=$(get_latest_version)
+    
+    if [ -n "${latest}" ] && [ "${current}" != "${latest}" ]; then
+        echo "Current version: ${current:-none}"
+        echo "Latest version:  ${latest}"
+        echo "Update available! Downloading..."
+    elif [ "${current}" = "${latest}" ]; then
+        echo "Already on latest version: ${latest}"
+        exit 0
+    else
+        echo "Could not determine version. Proceeding with install..."
+    fi
+fi
 
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
