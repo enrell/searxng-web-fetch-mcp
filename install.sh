@@ -13,14 +13,46 @@ ARCH=$(uname -m)
 
 case "${OS}" in
   linux)
-    PLATFORM="linux-x86_64"
+    case "${ARCH}" in
+      x86_64)
+        PLATFORM="linux-x86_64"
+        ;;
+      aarch64|arm64)
+        PLATFORM="linux-arm64"
+        ;;
+      riscv64)
+        PLATFORM="linux-riscv64"
+        ;;
+      *)
+        echo "Unsupported Linux architecture: ${ARCH}"
+        exit 1
+        ;;
+    esac
     ;;
   darwin)
-    if [ "${ARCH}" = "arm64" ]; then
-      PLATFORM="darwin-arm64"
-    else
-      PLATFORM="darwin-x86_64"
-    fi
+    case "${ARCH}" in
+      arm64)
+        PLATFORM="darwin-arm64"
+        ;;
+      x86_64|x86_64h)
+        PLATFORM="darwin-x86_64"
+        ;;
+      *)
+        echo "Unsupported macOS architecture: ${ARCH}"
+        exit 1
+        ;;
+    esac
+    ;;
+  mingw*|msys*|cygwin*|windows)
+    case "${ARCH}" in
+      x86_64)
+        PLATFORM="windows-x86_64"
+        ;;
+      *)
+        echo "Unsupported Windows architecture: ${ARCH}"
+        exit 1
+        ;;
+    esac
     ;;
   *)
     echo "Unsupported platform: ${OS}"

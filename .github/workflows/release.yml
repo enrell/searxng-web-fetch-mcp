@@ -8,42 +8,98 @@ permissions:
   contents: write
 
 jobs:
-  build-linux:
+  build-linux-x86_64:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
     - name: Install Crystal
       uses: crystal-lang/install-crystal@v1
       with:
         crystal: 1.13.0
-
-    - name: Build for Linux
+    - name: Build
       run: |
         shards install --without development
         crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-linux-x86_64 --release --static
-
-    - name: Upload to release
+    - name: Upload
       uses: softprops/action-gh-release@v1
       with:
         files: searxng-web-fetch-mcp-linux-x86_64
 
-  build-macos:
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Crystal
+      uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: 1.13.0
+    - name: Build
+      run: |
+        shards install --without development
+        crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-linux-arm64 --release --static
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: searxng-web-fetch-mcp-linux-arm64
+
+  build-linux-riscv64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Crystal
+      uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: 1.13.0
+    - name: Build
+      run: |
+        shards install --without development
+        crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-linux-riscv64 --release --static
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: searxng-web-fetch-mcp-linux-riscv64
+
+  build-macos-arm64:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
-
     - name: Install Crystal
-      run: |
-        brew install crystal
-
-    - name: Build for macOS
+      run: brew install crystal
+    - name: Build
       run: |
         shards install --without development
-        ARCH=$(uname -m)
-        crystal build src/searxng_web_fetch_mcp.cr -o "searxng-web-fetch-mcp-darwin-${ARCH}" --release
-
-    - name: Upload to release
+        crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-darwin-arm64 --release
+    - name: Upload
       uses: softprops/action-gh-release@v1
       with:
-        files: searxng-web-fetch-mcp-darwin-*
+        files: searxng-web-fetch-mcp-darwin-arm64
+
+  build-macos-x86_64:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Crystal
+      run: brew install crystal
+    - name: Build
+      run: |
+        shards install --without development
+        crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-darwin-x86_64 --release
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: searxng-web-fetch-mcp-darwin-x86_64
+
+  build-windows-x86_64:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Crystal
+      run: choco install crystal -y
+    - name: Build
+      run: |
+        shards install --without development
+        crystal build src/searxng_web_fetch_mcp.cr -o searxng-web-fetch-mcp-windows-x86_64.exe --release
+    - name: Upload
+      uses: softprops/action-gh-release@v1
+      with:
+        files: searxng-web-fetch-mcp-windows-x86_64.exe
