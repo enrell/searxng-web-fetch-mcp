@@ -110,8 +110,8 @@ class WebFetch < MCP::AbstractTool
                  HTTP::Client.new(target_uri)
                end
 
-      client.connect_timeout = 15.seconds
-      client.read_timeout = 15.seconds
+      client.connect_timeout = SearxngWebFetchMcp::MCP_TIMEOUT.seconds
+      client.read_timeout = SearxngWebFetchMcp::MCP_TIMEOUT.seconds
 
       request = HTTP::Request.new("GET", url)
       request.headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
@@ -140,7 +140,7 @@ class WebFetch < MCP::AbstractTool
       response.body
     rescue ex : IO::TimeoutError
       SearxngWebFetchMcp.log("ERROR", "Timeout fetching #{url}: #{ex.message}")
-      raise Exception.new("Request timeout after 15 seconds")
+      raise Exception.new("Request timeout after #{SearxngWebFetchMcp::MCP_TIMEOUT} seconds")
     rescue ex : Exception
       SearxngWebFetchMcp.log("ERROR", "Failed to fetch #{url}: #{ex.message}")
       raise ex

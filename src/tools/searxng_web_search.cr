@@ -85,9 +85,12 @@ class SearxngWebSearch < MCP::AbstractTool
   end
 
   private def create_proxy_client
-    # Connect directly to our SearXNG instance without sending the traffic through Byparr proxy
     uri = URI.parse(SEARXNG_URL)
-    HTTP::Client.new(uri)
+    client = HTTP::Client.new(uri)
+    client.read_timeout = SearxngWebFetchMcp::MCP_TIMEOUT.seconds
+    client.write_timeout = SearxngWebFetchMcp::MCP_TIMEOUT.seconds
+    client.connect_timeout = SearxngWebFetchMcp::MCP_TIMEOUT.seconds
+    client
   end
 
   private def parse_search_results(body : String)
