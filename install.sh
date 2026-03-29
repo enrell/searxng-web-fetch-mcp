@@ -91,7 +91,11 @@ esac
 
 echo "Downloading searxng-web-fetch-mcp for ${PLATFORM}..."
 TEMP_PATH="${INSTALL_PATH}.tmp"
-curl -fSL "https://github.com/${REPO}/releases/latest/download/searxng-web-fetch-mcp-${PLATFORM}" -o "${TEMP_PATH}"
+curl -L "https://github.com/${REPO}/releases/latest/download/searxng-web-fetch-mcp-${PLATFORM}" -o "${TEMP_PATH}" || {
+    echo "Download failed!"
+    rm -f "${TEMP_PATH}"
+    exit 1
+}
 mv "${TEMP_PATH}" "${INSTALL_PATH}"
 chmod +x "${INSTALL_PATH}"
 
