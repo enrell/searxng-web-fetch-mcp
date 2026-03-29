@@ -15,7 +15,7 @@ license: MIT
 dependencies:
   mcp:
     github: ralsina/mcp
-    version: 0.1.1
+    branch: main
   connect-proxy:
     github: spider-gazelle/connect-proxy
   lexbor:
