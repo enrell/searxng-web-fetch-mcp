@@ -11,7 +11,7 @@ mkdir -p "${BIN_DIR}"
 
 get_current_version() {
     if [ -f "${INSTALL_PATH}" ]; then
-        "${INSTALL_PATH}" 2>&1 | grep -oP 'v\d+\.\d+\.\d+' | head -1 || echo "unknown"
+        echo '' | "${INSTALL_PATH}" 2>&1 | grep -oP 'v\d+\.\d+\.\d+' | head -1 || echo "unknown"
     else
         echo "none"
     fi
